@@ -18,7 +18,6 @@ enum _layers {
 };
 
 #define HYPER LT(_VIM, KC_ESCAPE)
-#define SUPERSPACE LT(_LOWER, KC_SPACE)
 
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -44,8 +43,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_GRV,  KC_1,    KC_2,    KC_3,    KC_4,    KC_5,    KC_6,    KC_7,    KC_8,    KC_9,    KC_0,    KC_MINS, KC_EQL,  KC_BSPC,
         KC_TAB,  KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,    KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_LBRC, KC_RBRC, KC_BSLS,
         HYPER,   KC_A,    KC_S,    KC_D,    KC_F,    KC_G,    KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,          KC_ENT,
-        KC_LSFT,          KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,          KC_RSFT,
-        KC_LGUI, MO(_FN), KC_LALT, KC_LCTL,          SUPERSPACE,                KC_RALT, KC_RCTL, KC_LEFT,   KC_UP, KC_DOWN, KC_RGHT
+        OSM(MOD_LSFT), KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,    OSM(MOD_RSFT),
+        KC_LGUI, MO(_FN), KC_LALT, KC_LCTL,          KC_SPACE,                KC_RALT, KC_RCTL, KC_LEFT,   KC_UP, KC_DOWN, KC_RGHT
     ),
      /*
      * Function layer
@@ -96,7 +95,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_LOWER] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
-        _______, _______, _______, _______, QK_BOOT, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+        _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
         _______,          _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
         _______, _______, _______, _______,          _______,                   _______, _______, _______, _______, _______, _______
@@ -120,7 +119,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_VIM] = LAYOUT(
         _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
         _______, _______, _______, _______, KC_END,  _______, _______, _______, _______, _______, KC_HOME, _______, _______, _______,
-        _______, _______, _______, WORD_NEXT, _______, _______, COPY,    _______, _______, _______, PASTE,   _______, _______, _______,
+        _______, QK_BOOT, _______, WORD_NEXT, _______, _______, COPY,    _______, _______, _______, PASTE,   _______, _______, _______,
         _______, _______, _______, _______, _______, TG(_GAME),KC_LEFT, KC_DOWN, KC_UP,  KC_RIGHT, _______, _______,          _______,
         _______,          _______, CUT,     _______, _______, WORD_PREV, _______, _______, _______, _______, _______,          _______,
         _______, _______, _______, _______,          _______,                   _______, _______, _______, _______, _______, _______
@@ -154,4 +153,26 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     return true;
+}
+
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+        case KC_MINS:
+            add_weak_mods(MOD_BIT(KC_LSFT));
+            return true;
+
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_BSPC:
+        case KC_DEL:
+        case KC_UNDS:
+        case KC_LSFT:
+        case KC_RSFT:
+            return true;
+
+        default:
+            return false;
+    }
 }
